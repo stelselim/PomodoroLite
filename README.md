@@ -4,5 +4,5 @@ Pomodoro Lite is an app that makes simple to use Pomodoro Technic for working or
 
 >> flutter pub get
 <br/>
->>flutter run 
+>> flutter run 
 
