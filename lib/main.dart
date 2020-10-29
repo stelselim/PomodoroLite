@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:pomodorolite/provider/appstate.dart';
 import 'package:pomodorolite/screens/home.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'notifications/notifications_config.dart';
 
 void main() {
-  /// Initiliaze before runApp()
-  WidgetsFlutterBinding.ensureInitialized();
   try {
-    initNotification(); // Initialize Notifications
+    if (!kIsWeb) {
+      WidgetsFlutterBinding.ensureInitialized();
+      initNotification(); // Initialize Notifications
+    }
   } catch (e) {
     print(e);
   }
+
   runApp(App());
 }
 

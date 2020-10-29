@@ -1,8 +1,11 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pomodorolite/notifications/notifications_config.dart';
 import 'package:pomodorolite/screens/pomodoro.dart';
+import 'package:pomodorolite/screens/statistics.dart';
 import 'package:pomodorolite/utils/pomodoroPreferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,23 +35,25 @@ class _HomePageState extends State<HomePage> {
   /// Body Widgets
   List<Widget> bodyWidgets = [
     Pomodoro(),
-    Center(
-      child: Text(
-        "Work In Progress!",
-        textScaleFactor: 2,
-      ),
-    ),
+    Statistics(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   getNotificationPermissions() async {
-    final bool result = await FlutterLocalNotificationsPlugin()
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+    if (!kIsWeb) {
+      final bool result = await FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+    }
   }
 
   @override
