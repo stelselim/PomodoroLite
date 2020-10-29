@@ -1,11 +1,11 @@
 {
-    "name": "PomodoroLite",
-    "short_name": "PomodoroLite",
+    "name": "pomodorolite",
+    "short_name": "pomodorolite",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Easy to Use Pomodoro!",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pomodorolite/provider/appstate.dart';
+import 'package:pomodorolite/utils/pomodoroPreferences.dart';
 import 'package:provider/provider.dart';
 
 /// Returns true if changed
@@ -65,7 +66,6 @@ Future<bool> showConfigureBottomSheet(
                         onChanged: (double value) {
                           setState(() {
                             rounds = value.roundToDouble().toInt();
-                            print(rounds);
                           });
                         },
                       ),
@@ -192,22 +192,31 @@ Future<bool> showConfigureBottomSheet(
                           "Save",
                           textScaleFactor: 1.15,
                         ),
-                        onPressed: () {
-                          final tosavePomodoro = pomodoro.copyWith(
-                            breakMinute: breakTime,
-                            rounds: rounds,
-                            workSessionMinute: workTime,
-                            isWorkTime: true,
-                          );
+                        onPressed: () async {
+                          try {
+                            final tosavePomodoro = pomodoro.copyWith(
+                              breakMinute: breakTime,
+                              rounds: rounds,
+                              workSessionMinute: workTime,
+                              isWorkTime: true,
+                            );
 
-                          Provider.of<AppState>(context, listen: false)
-                              .setCurrentRound(0);
+                            // Set Current Round => 0
+                            Provider.of<AppState>(context, listen: false)
+                                .setCurrentRound(0);
 
-                          Provider.of<AppState>(context, listen: false)
-                              .setPomodoro(tosavePomodoro);
+                            // Set Pomdoro Changes
+                            Provider.of<AppState>(context, listen: false)
+                                .setPomodoro(tosavePomodoro);
 
-                          Navigator.pop(context);
-                          changed = true;
+                            /// Set Pomodoro Changes Local => SharedPreferences
+                            await savePomodoroPreferences(tosavePomodoro);
+
+                            Navigator.pop(context);
+                            changed = true;
+                          } catch (e) {
+                            print(e);
+                          }
                         },
                       ),
                     ],
@@ -218,7 +227,12 @@ Future<bool> showConfigureBottomSheet(
               /// Space Bottom
               Expanded(
                 flex: 1,
-                child: Container(),
+                child: Container(
+                    // child: FlatButton(
+                    //   child: Text("gry"),
+                    //   onPressed: () async {},
+                    // ),
+                    ),
               ),
             ],
           ),
@@ -227,5 +241,6 @@ Future<bool> showConfigureBottomSheet(
     ),
   );
 
+  /// For Checking Changes
   return changed;
 }
