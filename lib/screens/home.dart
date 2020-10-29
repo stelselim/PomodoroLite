@@ -45,6 +45,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: CupertinoTabBar(
         currentIndex: currentIndex,
+        border: Border(top: BorderSide(width: 0.15)),
         onTap: (index) => onTapBottomTapItem(index),
         items: [
           BottomNavigationBarItem(
