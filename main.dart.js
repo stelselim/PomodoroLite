@@ -50245,7 +50245,7 @@ l=C.aV.h(0,700)
 l.toString
 return M.cc(k,T.lw(H.c([r,q,o,n,T.cW(N.a01(M.cc(C.K,L.bV("Configure",k,k,k,p.Rk(l,24,C.b0),k,k),k,k,k,k,k,k,m.a),new D.Pf(b,j)),1)],s),C.ap,C.bF,C.aj),k,k,k,k,k,k,k)}}
 D.Pb.prototype={
-$3:function(a,b,c){var s,r=null,q=b.b,p=q.b,o=q.a,n=b.a
+$3:function(a,b,c){var s,r=null,q=b.b,p=q.b*60,o=q.a*60,n=b.a
 if(n===q.d){q=this.a
 return new U.h7(p,new D.P6(q,n),r,P.aD(0,0,0,100,0,0),q,r)}s=this.a
 if(q.c)return new U.h7(p,new D.P7(p,s),new D.P8(a,s),P.aD(0,0,0,100,0,0),s,r)
