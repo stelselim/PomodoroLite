@@ -30,7 +30,10 @@ class _HomePageState extends State<HomePage> {
   List<Widget> bodyWidgets = [
     Pomodoro(),
     Center(
-      child: Text("Counter"),
+      child: Text(
+        "Work In Progress!",
+        textScaleFactor: 2,
+      ),
     ),
   ];
 
