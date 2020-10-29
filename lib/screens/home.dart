@@ -19,6 +19,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   /// Body Widgets
   List<Widget> bodyWidgets = [
     Pomodoro(),
@@ -34,7 +41,11 @@ class _HomePageState extends State<HomePage> {
       appBar: CupertinoNavigationBar(
         middle: Text(
           "Pomodoro Lite",
-          style: TextStyle(),
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.w800,
+            color: Colors.cyan.shade600,
+          ),
         ),
       ),
       body: CupertinoPageScaffold(

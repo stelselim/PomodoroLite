@@ -1,15 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pomodorolite/components/configureBottomSheet.dart';
 import 'package:pomodorolite/components/counter.dart';
+import 'package:pomodorolite/components/roundBar.dart';
+import 'package:pomodorolite/provider/appstate.dart';
+import 'package:pomodorolite/utils/counterOnFinished.dart';
+import 'package:provider/provider.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
 class Pomodoro extends StatelessWidget {
   const Pomodoro({Key key}) : super(key: key);
 
-  static const buttonTextStyle = TextStyle(
+  static final buttonTextStyle = TextStyle(
     fontSize: 26,
-    color: Colors.indigo,
+    color: Colors.cyan.shade500,
     fontWeight: FontWeight.w700,
   );
 
@@ -18,9 +23,6 @@ class Pomodoro extends StatelessWidget {
     final controller = CountdownController();
     controller.pause(); // Width Pause
 
-    int durationMinute = 10;
-    int dur = durationMinute * 60;
-
     return Container(
       child: Column(
         children: [
@@ -28,27 +30,102 @@ class Pomodoro extends StatelessWidget {
           Expanded(
             flex: 3,
             child: Center(
-              child: Countdown(
-                controller: controller,
-                seconds: dur,
-                build: (BuildContext context, double time) {
-                  /// Disable when initiiazed
-                  if (dur == time) {
-                    controller.pause();
-                  }
-                  return CounterWidget(
-                    time: time,
-                  );
-                },
-                interval: Duration(milliseconds: 100),
-                onFinished: () {
-                  print('Timer is done!');
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  /// Connected to The Provider
+                  Consumer<AppState>(
+                    builder: (context, state, _) {
+                      int durationInSeconds =
+                          state.pomodoroSettings.workSessionMinute * 60;
+                      int breakDurationInSeconds =
+                          state.pomodoroSettings.breakMinute * 60;
 
-                  /// Notify
-                },
+                      int currentRound = state.currentRound;
+
+                      /// Finished Countdown
+                      if (currentRound == state.pomodoroSettings.rounds) {
+                        // Returs Countdown because not to be memory leaks
+                        return Countdown(
+                          controller: controller,
+                          seconds: durationInSeconds,
+                          build: (BuildContext context, double time) {
+                            controller.pause();
+
+                            return CompletedCounterWidget(
+                              rounds: currentRound,
+                            );
+                          },
+                          interval: Duration(milliseconds: 100),
+                        );
+                      }
+
+                      if (state.pomodoroSettings.isWorkTime) {
+                        /// Work Time Counter
+                        return Countdown(
+                          controller: controller,
+                          seconds: durationInSeconds,
+                          build: (BuildContext context, double time) {
+                            /// Disable when initiiazed
+                            if (durationInSeconds == time) {
+                              controller.pause();
+                            }
+
+                            return CounterWidget(
+                              time: time,
+                            );
+                          },
+                          interval: Duration(milliseconds: 100),
+                          onFinished: () async {
+                            try {
+                              await counterOnFinished(context);
+                              controller.restart();
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                        );
+                      }
+
+                      /// Break Time Counter
+                      else {
+                        return Countdown(
+                          controller: controller,
+                          seconds: breakDurationInSeconds,
+                          build: (BuildContext context, double time) {
+                            /// Disable when initiiazed
+                            if (breakDurationInSeconds == time) {
+                              controller.pause();
+                            }
+
+                            return BreakCounterWidget(
+                              time: time,
+                            );
+                          },
+                          interval: Duration(milliseconds: 100),
+                          onFinished: () async {
+                            try {
+                              await breakCounterFinished(context);
+                              controller.restart();
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                        );
+                      }
+                    },
+                  ),
+
+                  /// Current Round
+                  Positioned(
+                    child: RoundBar(),
+                    bottom: 15,
+                  ),
+                ],
               ),
             ),
           ),
+
           // Resume
           Expanded(
             flex: 1,
@@ -91,7 +168,7 @@ class Pomodoro extends StatelessWidget {
                 showCupertinoDialog(
                   context: context,
                   builder: (context) => CupertinoAlertDialog(
-                    content: Text("Are You Sure To RESTART?"),
+                    content: Text("Are You Sure To Restart?"),
                     actions: [
                       CupertinoDialogAction(
                         child: Text("Cancel"),
@@ -100,10 +177,26 @@ class Pomodoro extends StatelessWidget {
                         },
                       ),
                       CupertinoDialogAction(
-                        child: Text("Restart"),
+                        child: Text("Restart This Sesion"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          controller.restart();
+                        },
+                      ),
+                      CupertinoDialogAction(
+                        child: Text("Restart All"),
                         onPressed: () async {
                           try {
                             Navigator.of(context).pop();
+
+                            // Set Round => 0
+                            Provider.of<AppState>(context, listen: false)
+                                .setCurrentRound(0);
+
+                            // Set Work Time => true
+                            Provider.of<AppState>(context, listen: false)
+                                .setWorkTime();
+
                             await Future.delayed(Duration(milliseconds: 200));
                             controller.restart();
                           } catch (e) {
@@ -143,35 +236,21 @@ class Pomodoro extends StatelessWidget {
                 ),
               ),
               onPressed: () async {
-                double val = 2;
-                await showModalBottomSheet(
-                  context: context,
-                  builder: (context) => Container(
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    color: Colors.grey.shade200,
-                    child: StatefulBuilder(
-                      builder: (context, setState) => Column(
-                        children: [
-                          SizedBox(
-                            height: 25,
-                          ),
-                          CupertinoSlider(
-                            max: 10,
-                            min: 1,
-                            value: val,
-                            divisions: 9,
-                            onChanged: (double value) {
-                              setState(() {
-                                val = value.roundToDouble();
-                              });
-                            },
-                          ),
-                          Text("Val: $val"),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
+                try {
+                  bool changes = await showConfigureBottomSheet(
+                    context,
+                  );
+
+                  // Wait For Changes
+                  await Future.delayed(Duration(milliseconds: 300));
+
+                  if (changes) {
+                    controller.restart();
+                    controller.pause();
+                  }
+                } catch (e) {
+                  print(e);
+                }
               },
             ),
           ),

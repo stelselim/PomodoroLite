@@ -3,19 +3,22 @@ import 'dart:convert';
 class Pomodoro {
   int breakMinute; // Break Minute
   int workSessionMinute; // Work Session's Minute
-  int round; // Work Round
+  bool isWorkTime; // Work Time Or Break Time
+  int rounds; // Work Round
 
   Pomodoro({
     this.breakMinute = 5,
     this.workSessionMinute = 25,
-    this.round = 5,
+    this.isWorkTime = true,
+    this.rounds = 4,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'breakMinute': breakMinute,
       'workSessionMinute': workSessionMinute,
-      'round': round,
+      'isWorkTime': isWorkTime,
+      'rounds': rounds,
     };
   }
 
@@ -25,7 +28,8 @@ class Pomodoro {
     return Pomodoro(
       breakMinute: map['breakMinute'],
       workSessionMinute: map['workSessionMinute'],
-      round: map['round'],
+      isWorkTime: map['isWorkTime'],
+      rounds: map['rounds'],
     );
   }
 
@@ -37,16 +41,19 @@ class Pomodoro {
   Pomodoro copyWith({
     int breakMinute,
     int workSessionMinute,
-    int round,
+    bool isWorkTime,
+    int rounds,
   }) {
     return Pomodoro(
       breakMinute: breakMinute ?? this.breakMinute,
       workSessionMinute: workSessionMinute ?? this.workSessionMinute,
-      round: round ?? this.round,
+      isWorkTime: isWorkTime ?? this.isWorkTime,
+      rounds: rounds ?? this.rounds,
     );
   }
 
   @override
-  String toString() =>
-      'Pomodoro(breakMinute: $breakMinute, workSessionMinute: $workSessionMinute, round: $round)';
+  String toString() {
+    return 'Pomodoro(breakMinute: $breakMinute, workSessionMinute: $workSessionMinute, isWorkTime: $isWorkTime, rounds: $rounds)';
+  }
 }
