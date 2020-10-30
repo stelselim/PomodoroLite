@@ -61,7 +61,7 @@ class Statistics extends StatelessWidget {
                       selectedDate: toDate,
                       series: [
                         BezierLine(
-                          label: "Duty",
+                          label: "WorkTime",
                           data: [
                             DataPoint<DateTime>(
                               value: statsList.elementAt(0).toDouble(),
